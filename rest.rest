@@ -1,0 +1,34 @@
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+    "username":"James",
+    "password":"12345"
+}
+
+###
+
+POST  http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+    "username":"James",
+    "password":"12345"
+}
+
+###
+
+GET  http://localhost:3001/api/auth/check?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiNjAwZGY0ZGQxZDRhZWM1OWQwM2FhYjdkIiwiaWF0IjoxNjExNTI3NzU3LCJleHAiOjE2MTE1Mjc3ODcsImlzcyI6ImpvZWp1bmciLCJzdWIiOiJ1c2VySW5mbyJ9.Aqz9SYeLxBmZZnK-VP0o98zY_a8XFJ7LSSSEqrqawZE
+
+###
+
+GET  http://localhost:3001/api/user/list?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiX2lkIjoiNjAwZGU3YTk4MzgzMDUxMGVjOWRjOWE1IiwidXNlcm5hbWUiOiJKYW1lcyIsInBhc3N3b3JkIjoiU2NFUTRWRzBGTDM1RHJsdzU4c0RxVTIzUGpFPSIsIl9fdiI6MCwiaWF0IjoxNjExNTI0MDE1LCJleHAiOjE2MTE1MjQwNDUsImlzcyI6ImpvZWp1bmciLCJzdWIiOiJ1c2VySW5mbyJ9.s_HfFoWZHnXwJLEoYlzjBptX2hezAYZAW6YrIpw5Ug4
+
+###
+
+POST  http://localhost:3001/api/auth/token
+Content-Type: application/json
+
+{
+    "refreshToken":"eyJhbGciOiJIUzI1NiJ9.NjAwZGY0ZGQxZDRhZWM1OWQwM2FhYjdk.i6hmFLd9RPbGeYQry64KII0xwU9qe0C3LkC7Pdrup6c"
+}
