@@ -75,7 +75,6 @@ exports.login = (req, res) => {
     const access_token_secret = req.app.get('jwt-access_token_secret');
     console.log('access_token_secret ' + access_token_secret);
     // check the user info & generate the jwt
-        // check the user info & generate the jwt
     const check = (user) => {
         if(!user) {
             // user does not exist
@@ -94,7 +93,7 @@ exports.login = (req, res) => {
                         }, 
                         access_token_secret,
                         {
-                            expiresIn: '1d',
+                            expiresIn: '30s',
                             issuer: 'joejung',
                             subject: 'userInfo'
                         }
@@ -120,7 +119,7 @@ exports.login = (req, res) => {
         console.log('accessToken: ' + userWithToken.accessToken);
         const refresh_token_secret = req.app.get('jwt-refresh_token_secret');
         let refreshToken = jwt.sign(userWithToken.user._id.toJSON(),refresh_token_secret);
-        User.findByIdAndUpdate({_id: userWithToken.user._id}, {$set: {refreshToken: refreshToken}}, {new:true}, function(err,doc) {
+        User.updateOne({_id: userWithToken.user._id}, {$set: {refreshToken: refreshToken}}, {new:true}, function(err,doc) {
             if (err) { throw err; }
             else { console.log("Updated"); }
         });  
@@ -134,7 +133,7 @@ exports.login = (req, res) => {
         res.json({
             message: 'logged in successfully',
             token
-        })
+        });
     }
 
     // error occured
@@ -167,21 +166,42 @@ exports.check = (req, res) => {
     POST /api/auth/token
 */
 exports.token = (req,res) => {
-    const refreshToken = req.body.refreshToken;
-    const refresh_token_secret = req.app.get('jwt-refresh_token_secret');
-    const access_token_secret = req.app.get('jwt-access_token_secret');
-    if(refreshToken == null) return res.sendStatus(401);
-    jwt.verify(refreshToken,refresh_token_secret,(err,user)=> {
-        console.log('user ' + user);
-        if (err) return res.sendStatus(403)
-        const accessToken = jwt.sign(
-            {user}, 
-            access_token_secret,
-            {
-                expiresIn: '1d',
-                issuer: 'joejung',
-                subject: 'userInfo'
-            });
-        res.json({accessToken:accessToken});
-    })
+    const getNewAccessToken = new Promise((resolve, reject) => {
+        const refreshToken = req.body.refreshToken;
+        const refresh_token_secret = req.app.get('jwt-refresh_token_secret');
+        const access_token_secret = req.app.get('jwt-access_token_secret');
+        if(refreshToken == null) return res.sendStatus(401);
+        jwt.verify(refreshToken,refresh_token_secret,(err,user)=> {
+            console.log('user ' + user);
+            if (err) return res.sendStatus(403)
+            const accessToken = jwt.sign(
+                {user}, 
+                access_token_secret,
+                {
+                    expiresIn: '30s',
+                    issuer: 'joejung',
+                    subject: 'userInfo'
+                });
+            resolve(accessToken);
+        });
+    });
+
+    // respond the token 
+    const respond = (token) => {
+        res.json({
+            success: true,
+            token
+        });
+    }
+
+    // error occured
+    const onError = (error) => {
+        res.status(403).json({
+            message: error.message
+        })
+    }
+
+    getNewAccessToken
+    .then(respond)
+    .catch(onError)
 }
